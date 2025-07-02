@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Webhook App - {% block title %}{% endblock %}</title>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        .navbar { background-color: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin: 0 15px; }
+        .navbar a:hover { text-decoration: underline; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2, h3, h4 { color: #333; text-align: center; margin-bottom: 20px; }
+        form { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+        form p { margin-bottom: 10px; }
+        form input[type="text"], form input[type="password"], form input[type="email"], form input[type="url"] {
+            width: calc(100% - 22px); padding: 10px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;
+        }
+        form button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        form button:hover { background-color: #0056b3; }
+        .errorlist { color: red; list-style-type: none; padding: 0; margin: 0 0 10px 0; }
+        .success, .error, .info { padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .event-log { border: 1px solid #eee; margin-top: 20px; padding: 15px; background-color: #fcfcfc; border-radius: 8px; }
+        .event-log h3 { text-align: center; margin-bottom: 15px; color: #555; }
+        .event-item { border-bottom: 1px dashed #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .event-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .event-item p { margin: 5px 0; font-size: 0.9em; }
+        .event-item pre { background-color: #e9e9e9; padding: 10px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 0.8em; }
+        code { background-color: #e0e0e0; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div>
+            <a href="{% url 'dashboard' %}">Home</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Hello, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

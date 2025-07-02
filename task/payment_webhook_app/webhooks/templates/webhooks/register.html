@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    <h1>Register Account</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <p>
+                {{ field.label_tag }}<br>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: gray;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="errorlist">{{ error }}</p>
+                {% endfor %}
+            </p>
+        {% endfor %}
+        <button type="submit">Register</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px;">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+{% endblock %}

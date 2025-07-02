@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Welcome, {{ user.username }}!</h1>
+
+    <h2>Webhook Subscription Settings</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Webhook Settings</button>
+    </form>
+
+    <div class="event-log">
+        <h3>Recent Received Webhook Events (Last 10)</h3>
+        <p style="text-align: center; font-size: 0.9em; color: #666; margin-bottom: 15px;">
+            These are events received by your app's <code>/receive-webhook/</code> endpoint.
+            <br>
+            If your webhook is active, your subscribed URL should also receive these.
+        </p>
+        {% if recent_events %}
+            <ul>
+                {% for event in recent_events %}
+                    <li class="event-item">
+                        <p><strong>Event ID:</strong> <code>{{ event.event_id|default:"N/A" }}</code></p>
+                        <p><strong>Received At:</strong> {{ event.received_at }}</p>
+                        <p><strong>Processed:</strong> {{ event.processed }}</p>
+                        <p><strong>Payload:</strong></p>
+                        <pre>{{ event.payload|json_script:"event-payload-"|add:forloop.counter }}</pre>
+                        <script>
+                            // Parse and pretty-print JSON payload for each event
+                            const scriptId = "event-payload-" + "{{ forloop.counter }}";
+                            const scriptElement = document.getElementById(scriptId);
+                            if (scriptElement) {
+                                try {
+                                    const rawJson = JSON.parse(scriptElement.textContent);
+                                    scriptElement.textContent = JSON.stringify(rawJson, null, 2);
+                                } catch (e) {
+                                    // Keep original text if parsing fails
+                                }
+                            }
+                        </script>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="text-align: center;">No payment events received yet.</p>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; padding: 20px; background-color: #eaf5ff; border-radius: 8px; border: 1px solid #cce5ff;">
+        <h3>How to Test Incoming Webhooks:</h3>
+        <p>
+            You can simulate an incoming payment webhook by sending a <strong>POST</strong> request to:
+            <br>
+            <code>http://127.0.0.1:8000/receive-webhook/</code>
+        </p>
+        <p>
+            Use a tool like Postman, Insomnia, <code>curl</code>, or a simple Python script.
+            <br>
+            Set <strong>Content-Type: application/json</strong> and use a JSON body like this:
+        </p>
+        <pre style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; text-align: left; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;"><code>{
+    "id": "evt_youruniqueid_123",
+    "type": "payment_succeeded",
+    "data": {
+        "amount": 1000,
+        "currency": "usd",
+        "customer_id": "cus_abc",
+        "payment_method": "card",
+        "details": "Example transaction data"
+    },
+    "timestamp": "{{ now }}"
+}</code></pre>
+        <p>
+            <strong>Note:</strong> If you've subscribed a URL (e.g., from <a href="https://webhook.site" target="_blank">webhook.site</a>), your app will attempt to forward this payload to that URL.
+        </p>
+    </div>
+{% endblock %}
